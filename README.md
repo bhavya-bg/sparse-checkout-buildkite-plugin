@@ -46,9 +46,25 @@ Enable verbose logging with bash execution tracing (`set -x`). This shows each c
 
 Options that run after the sparse checkout completes, in the `post-checkout` hook.
 
-##### `unshallow` ('true' or 'false')
+#### `unshallow` ('true' or 'false')
 
 Convert the shallow clone into a full-depth clone by running `git fetch --unshallow origin` after checkout. This is useful when your build requires full git history (for example, changelog generation, `git log`, or `git blame`). If the repository is already unshallow, this step is skipped.
+
+## Environment Variables
+
+### BUILDKITE_PULL_REQUEST_USING_MERGE_REFSPEC
+When `BUILDKITE_PULL_REQUEST_USING_MERGE_REFSPEC=true`, the plugin will retry the
+GitHub merge ref checkout if it sees the known "missing merge ref" failure:
+
+- retry after 2 seconds
+- retry after 5 seconds
+- if the merge ref is still unavailable, fall back to the normal non-merge-ref
+  target (`BUILDKITE_BRANCH` when `BUILDKITE_COMMIT=HEAD`, otherwise
+  `BUILDKITE_COMMIT`)
+
+This retry logic only applies to the specific merge-ref-not-ready error. Other
+`git fetch` failures still fail immediately.
+
 
 ## Example
 
